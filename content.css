@@ -1,29 +1,34 @@
 /* ===== Quick Translator ===== */
 
 /* ---------- Color tokens ---------- */
-#qt-popup, #qt-btn {
-  --bg-base:        #0d1117;
-  --bg-surface:     #161b22;
-  --bg-result:      #111928;
-  --bg-copy:        #12171f;
-  --border:         #1e2a3a;
-  --border-result:  #1e3a5f;
+#qt-popup,
+#qt-btn {
+  --bg-base: #0d1117;
+  --bg-surface: #161b22;
+  --bg-result: #111928;
+  --bg-copy: #12171f;
+  --border: #1e2a3a;
+  --border-result: #1e3a5f;
 
-  --accent:         #2979ff;
-  --accent-hover:   #448aff;
-  --accent-active:  #1a56d6;
-  --accent-light:   #58a6ff;
+  --accent: #2979ff;
+  --accent-hover: #448aff;
+  --accent-active: #1a56d6;
+  --accent-light: #58a6ff;
 
-  --text-primary:   #c9d1d9;
-  --text-muted:     #484f58;
-  --text-white:     #fff;
+  --text-primary: #c9d1d9;
+  --text-muted: #484f58;
+  --text-white: #fff;
 
-  --err-bg:         #1a0e0e;
-  --err-border:     #4a1a1a;
-  --err-text:       #ff6b6b;
+  --err-bg: #1a0e0e;
+  --err-border: #4a1a1a;
+  --err-text: #ff6b6b;
 
-  --success:        #3fb950;
+  --success: #3fb950;
   --success-border: #1a3a2a;
+
+  --scrollbar-track: #161b22;
+  --scrollbar-thumb: #1e3a5f;
+  --scrollbar-thumb-hover: #2a5388;
 }
 
 /* ---------- Floating icon button ---------- */
@@ -157,6 +162,13 @@
 .qt-lang-row select:focus {
   outline: none;
   border-color: var(--accent);
+  background: var(--bg-base);
+  color: var(--text-primary);
+}
+
+.qt-lang-row select option {
+  background: var(--bg-surface);
+  color: var(--text-primary);
 }
 
 .qt-arrow {
@@ -194,6 +206,29 @@
   border: 1px solid var(--border);
 }
 
+/* Scrollbar */
+.qt-original-box::-webkit-scrollbar,
+.qt-result-box::-webkit-scrollbar {
+  width: 4px;
+}
+
+.qt-original-box::-webkit-scrollbar-track,
+.qt-result-box::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+  border-radius: 0 6px 6px 0;
+}
+
+.qt-original-box::-webkit-scrollbar-thumb,
+.qt-result-box::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 4px;
+}
+
+.qt-original-box::-webkit-scrollbar-thumb:hover,
+.qt-result-box::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
+
 /* Result box */
 .qt-result-box {
   margin: 0 12px 12px;
@@ -206,6 +241,8 @@
   border-radius: 8px;
   border: 1px solid var(--border-result);
   min-height: 40px;
+  max-height: 240px;
+  overflow-y: auto;
 }
 
 .qt-result-box.qt-result-error {

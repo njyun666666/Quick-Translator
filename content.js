@@ -106,8 +106,9 @@
     }
     if (left < margin) left = margin;
 
-    if (top + 260 > window.innerHeight) {
-      top = rect.top - 260 - margin;
+    const elHeight = el.offsetHeight || 260;
+    if (top + elHeight > window.innerHeight - margin) {
+      top = rect.top - elHeight - margin;
       if (top < margin) top = margin;
     }
 
@@ -116,9 +117,21 @@
   }
 
   function showBtn(rect) {
+    const margin  = 8;
+    const btnSize = 32;
     const cx = rect.left + rect.width / 2;
-    btnEl.style.left    = cx - 16 + "px";
-    btnEl.style.top     = rect.bottom + 8 + "px";
+
+    let left = cx - btnSize / 2;
+    let top  = rect.bottom + margin;
+
+    if (left + btnSize > window.innerWidth - margin) left = window.innerWidth - btnSize - margin;
+    if (left < margin) left = margin;
+
+    if (top + btnSize > window.innerHeight - margin) top = window.innerHeight - btnSize - margin;
+    if (top < margin) top = margin;
+
+    btnEl.style.left    = left + "px";
+    btnEl.style.top     = top  + "px";
     btnEl.style.display = "flex";
     popupEl.style.display = "none";
   }
@@ -246,9 +259,12 @@
           resultBox.querySelector(".qt-speak").addEventListener("click", function () {
             speakText(this, targetLang, translated);
           });
+
+          positionEl(popupEl, savedRect, 300);
         } else {
           resultBox.className += " qt-result-error";
           resultBox.innerHTML  = "<span>翻譯失敗，請稍後再試</span>";
+          positionEl(popupEl, savedRect, 300);
         }
       },
     );
