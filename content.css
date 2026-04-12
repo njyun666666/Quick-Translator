@@ -166,9 +166,22 @@
 }
 
 /* Original text */
-.qt-original-box {
+.qt-original-wrap {
+  position: relative;
   margin: 8px 12px 4px;
-  padding: 6px 8px;
+}
+
+.qt-original-wrap .qt-speak {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  padding: 0 8px;
+  border-radius: 0 6px 6px 0;
+}
+
+.qt-original-box {
+  padding: 6px 32px 6px 8px;
   background: var(--bg-surface);
   border-radius: 6px;
   font-size: 12px;
@@ -201,11 +214,49 @@
   color: var(--err-text);
 }
 
+.qt-result-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
 .qt-result-lang {
   font-size: 11px;
   color: var(--accent-light);
-  margin-bottom: 4px;
   font-weight: 500;
+}
+
+.qt-speak {
+  all: unset;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  padding: 6px 10px;
+  border-radius: 4px;
+  transition:
+    color 0.15s,
+    background 0.15s;
+}
+
+.qt-speak:hover {
+  color: var(--accent-light);
+  background: var(--border);
+}
+
+.qt-speak.qt-speaking {
+  color: var(--accent);
+}
+
+.qt-speak.qt-speak-loading {
+  color: var(--text-muted);
+  opacity: 0.5;
+}
+
+.qt-speak.qt-speak-error {
+  color: var(--err-text);
 }
 
 .qt-result-text {

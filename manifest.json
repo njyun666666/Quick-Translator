@@ -4,7 +4,8 @@
   "version": "1.0",
   "description": "選取文字即時翻譯",
   "host_permissions": [
-    "https://translate.googleapis.com/*"
+    "https://translate.googleapis.com/*",
+    "https://translate.google.com/*"
   ],
   "background": {
     "service_worker": "background.js"

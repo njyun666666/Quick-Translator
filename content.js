@@ -52,7 +52,12 @@
         ).join("")}
       </select>
     </div>
-    <div class="qt-original-box" id="qt-original"></div>
+    <div class="qt-original-wrap">
+      <div class="qt-original-box" id="qt-original"></div>
+      <button class="qt-speak" id="qt-speak-original" aria-label="朗讀原文">
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+      </button>
+    </div>
     <div class="qt-result-box" id="qt-result"></div>
   `;
 
@@ -62,14 +67,16 @@
   // refs
   const sourceSelect = popupEl.querySelector("#qt-source");
   const targetSelect = popupEl.querySelector("#qt-target");
-  const originalBox  = popupEl.querySelector("#qt-original");
-  const resultBox    = popupEl.querySelector("#qt-result");
-  const closeBtn     = popupEl.querySelector(".qt-close");
-  const googleLink   = popupEl.querySelector("#qt-open-google");
+  const originalBox     = popupEl.querySelector("#qt-original");
+  const resultBox       = popupEl.querySelector("#qt-result");
+  const closeBtn        = popupEl.querySelector(".qt-close");
+  const googleLink      = popupEl.querySelector("#qt-open-google");
+  const speakOriginalBtn = popupEl.querySelector("#qt-speak-original");
 
   // state
-  let savedText = "";
-  let savedRect = null;
+  let savedText          = "";
+  let savedRect          = null;
+  let detectedSourceLang = "";
 
   // ---------- helpers ----------
 
@@ -136,6 +143,53 @@
     doTranslate();
   }
 
+  const svgCopy  = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
+  const svgSpeak = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>`;
+  const svgStop  = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>`;
+
+  // ---------- speak ----------
+
+  function speakText(btn, lang, text) {
+    if (!lang || lang === "auto") return;
+
+    if (btn._audio && !btn._audio.paused) {
+      btn._audio.pause();
+      btn._audio = null;
+      btn.classList.remove("qt-speaking");
+      btn.innerHTML = btn._origHtml;
+      return;
+    }
+
+    btn.classList.add("qt-speak-loading");
+    btn.disabled = true;
+
+    chrome.runtime.sendMessage(
+      { type: "SPEAK", payload: { target: lang, text } },
+      (res) => {
+        btn.classList.remove("qt-speak-loading");
+        btn.disabled = false;
+
+        if (!res || !res.ok) {
+          btn.classList.add("qt-speak-error");
+          setTimeout(() => btn.classList.remove("qt-speak-error"), 1500);
+          return;
+        }
+
+        const audio = new Audio(res.dataUrl);
+        btn._audio = audio;
+        btn._origHtml = btn.innerHTML;
+        btn.innerHTML = svgStop;
+        audio.play();
+        btn.classList.add("qt-speaking");
+        audio.addEventListener("ended", () => {
+          btn.classList.remove("qt-speaking");
+          btn._audio = null;
+          btn.innerHTML = btn._origHtml;
+        });
+      },
+    );
+  }
+
   // ---------- translate ----------
 
   function doTranslate() {
@@ -159,34 +213,38 @@
         const data = response.data;
         if (data.status === "success") {
           const translated = data.translatedText;
+          const targetLang  = data.targetLanguage;
+
+          // 更新偵測到的來源語言，供原文語音使用
+          detectedSourceLang = data.sourceLanguage;
+
           resultBox.innerHTML = `
-            <div class="qt-result-lang">
-              ${escapeHtml(langLabel(data.sourceLanguage))} &#8594; ${escapeHtml(langLabel(data.targetLanguage))}
+            <div class="qt-result-header">
+              <span class="qt-result-lang">
+                ${escapeHtml(langLabel(detectedSourceLang))} &#8594; ${escapeHtml(langLabel(targetLang))}
+              </span>
+              <button class="qt-speak" aria-label="朗讀譯文">${svgSpeak}</button>
             </div>
             <div class="qt-result-text">${escapeHtml(translated)}</div>
             <div class="qt-copy-row">
-              <button class="qt-copy" aria-label="複製譯文">
-                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-                </svg>
-                複製
-              </button>
+              <button class="qt-copy" aria-label="複製譯文">${svgCopy} 複製</button>
             </div>
           `;
+
           resultBox.querySelector(".qt-copy").addEventListener("click", () => {
             navigator.clipboard.writeText(translated).then(() => {
               const btn = resultBox.querySelector(".qt-copy");
               btn.textContent = "已複製";
               btn.classList.add("qt-copied");
               setTimeout(() => {
-                btn.innerHTML = `
-                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-                  </svg>
-                  複製`;
+                btn.innerHTML = svgCopy + " 複製";
                 btn.classList.remove("qt-copied");
               }, 1500);
             });
+          });
+
+          resultBox.querySelector(".qt-speak").addEventListener("click", function () {
+            speakText(this, targetLang, translated);
           });
         } else {
           resultBox.className += " qt-result-error";
@@ -244,6 +302,10 @@
   });
 
   closeBtn.addEventListener("click", () => hide());
+
+  speakOriginalBtn.addEventListener("click", function () {
+    speakText(this, detectedSourceLang, savedText);
+  });
 
   // Re-translate and update Google link on language change
   sourceSelect.addEventListener("change", () => { updateGoogleLink(); doTranslate(); });
