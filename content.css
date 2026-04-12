@@ -1,0 +1,261 @@
+/* ===== Quick Translator ===== */
+
+/* ---------- Color tokens ---------- */
+#qt-popup, #qt-btn {
+  --bg-base:        #0d1117;
+  --bg-surface:     #161b22;
+  --bg-result:      #111928;
+  --bg-copy:        #12171f;
+  --border:         #1e2a3a;
+  --border-result:  #1e3a5f;
+
+  --accent:         #2979ff;
+  --accent-hover:   #448aff;
+  --accent-active:  #1a56d6;
+  --accent-light:   #58a6ff;
+
+  --text-primary:   #c9d1d9;
+  --text-muted:     #484f58;
+  --text-white:     #fff;
+
+  --err-bg:         #1a0e0e;
+  --err-border:     #4a1a1a;
+  --err-text:       #ff6b6b;
+
+  --success:        #3fb950;
+  --success-border: #1a3a2a;
+}
+
+/* ---------- Floating icon button ---------- */
+
+#qt-btn {
+  all: initial;
+  position: fixed;
+  z-index: 2147483647;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 2px 10px rgba(41, 121, 255, 0.45);
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    transform 0.1s;
+  user-select: none;
+}
+
+#qt-btn:hover {
+  background: var(--accent-hover);
+  transform: scale(1.1);
+}
+
+#qt-btn:active {
+  transform: scale(0.95);
+}
+
+/* ---------- Popup ---------- */
+
+#qt-popup {
+  all: initial;
+  position: fixed;
+  z-index: 2147483646;
+  display: none;
+  width: 300px;
+  background: var(--bg-base);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.65);
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 13px;
+  color: var(--text-primary);
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+/* Header */
+.qt-header {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.qt-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent-light);
+  letter-spacing: 0.3px;
+  padding: 10px 12px 9px;
+}
+
+.qt-header-actions {
+  display: flex;
+  align-items: stretch;
+}
+
+.qt-open-google,
+.qt-close {
+  all: unset;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  transition:
+    color 0.15s,
+    background 0.15s;
+}
+
+.qt-open-google {
+  color: #6c7086;
+  font-size: 13px;
+}
+
+.qt-open-google:hover {
+  color: var(--text-primary);
+  background: var(--border);
+}
+
+.qt-close {
+  color: var(--text-primary);
+  font-size: 13px;
+  line-height: 1;
+}
+
+.qt-close:hover {
+  color: var(--text-primary);
+  background: var(--border);
+}
+
+/* Language row */
+.qt-lang-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 12px 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.qt-lang-row select {
+  all: unset;
+  flex: 1;
+  background: var(--bg-surface);
+  border-radius: 6px;
+  padding: 5px 8px;
+  font-size: 12px;
+  color: var(--text-primary);
+  cursor: pointer;
+  appearance: auto;
+  -webkit-appearance: auto;
+  border: 1px solid var(--border);
+  transition: border-color 0.15s;
+}
+
+.qt-lang-row select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.qt-arrow {
+  color: var(--text-primary);
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+/* Original text */
+.qt-original-box {
+  margin: 8px 12px 4px;
+  padding: 6px 8px;
+  background: var(--bg-surface);
+  border-radius: 6px;
+  font-size: 12px;
+  color: var(--text-primary);
+  max-height: 70px;
+  overflow-y: auto;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+  border: 1px solid var(--border);
+}
+
+/* Result box */
+.qt-result-box {
+  margin: 0 12px 12px;
+  min-height: 0;
+}
+
+.qt-result-box:not(:empty) {
+  padding: 8px 10px;
+  background: var(--bg-result);
+  border-radius: 8px;
+  border: 1px solid var(--border-result);
+  min-height: 40px;
+}
+
+.qt-result-box.qt-result-error {
+  background: var(--err-bg);
+  border-color: var(--err-border);
+  color: var(--err-text);
+}
+
+.qt-result-lang {
+  font-size: 11px;
+  color: var(--accent-light);
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+
+.qt-result-text {
+  font-size: 14px;
+  color: var(--text-primary);
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Copy button */
+.qt-copy-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+.qt-copy {
+  all: unset;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  font-size: 11px;
+  color: var(--accent-light);
+  background: var(--bg-copy);
+  padding: 3px 7px;
+  border-radius: 5px;
+  border: 1px solid var(--border-result);
+  transition:
+    color 0.15s,
+    background 0.15s,
+    border-color 0.15s;
+}
+
+.qt-copy:hover {
+  color: var(--accent-light);
+  background: var(--border);
+  border-color: var(--accent);
+}
+
+.qt-copy.qt-copied {
+  color: var(--success);
+  border-color: var(--success-border);
+}
+
+.qt-loading {
+  display: block;
+  color: var(--text-muted);
+  font-size: 12px;
+  text-align: center;
+  padding: 4px 0;
+}
