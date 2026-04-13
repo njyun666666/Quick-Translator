@@ -87,6 +87,12 @@
   justify-content: space-between;
   background: var(--bg-surface);
   border-bottom: 1px solid var(--border);
+  cursor: grab;
+  user-select: none;
+}
+
+.qt-header:active {
+  cursor: grabbing;
 }
 
 .qt-title {
@@ -197,6 +203,7 @@
   background: var(--bg-surface);
   border-radius: 6px;
   font-size: 12px;
+  text-align: justify;
   color: var(--text-primary);
   max-height: 70px;
   overflow-y: auto;
@@ -298,10 +305,13 @@
 
 .qt-result-text {
   font-size: 14px;
+  text-align: justify;
   color: var(--text-primary);
   line-height: 1.6;
   white-space: pre-wrap;
   word-break: break-word;
+  user-select: text;
+  cursor: text;
 }
 
 /* Copy button */

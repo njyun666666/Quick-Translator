@@ -276,10 +276,41 @@
   btnEl.addEventListener("mousedown", (e) => e.preventDefault());
   popupEl.addEventListener("mousedown", (e) => {
     const tag = e.target.tagName;
+    if (e.target.closest(".qt-result-text, .qt-original-box")) return;
     if (!["SELECT", "BUTTON", "INPUT", "TEXTAREA"].includes(tag)) {
       e.preventDefault();
     }
   });
+
+  // Drag header to move popup
+  const headerEl = popupEl.querySelector(".qt-header");
+  let dragging = false;
+  let dragOffsetX = 0;
+  let dragOffsetY = 0;
+
+  headerEl.addEventListener("mousedown", (e) => {
+    // Only drag on left-click, not on buttons/links inside the header
+    if (e.button !== 0) return;
+    if (e.target.closest("button, a")) return;
+    dragging = true;
+    const rect = popupEl.getBoundingClientRect();
+    dragOffsetX = e.clientX - rect.left;
+    dragOffsetY = e.clientY - rect.top;
+    e.preventDefault();
+  });
+
+  document.addEventListener("mousemove", (e) => {
+    if (!dragging) return;
+    const margin = 8;
+    let left = e.clientX - dragOffsetX;
+    let top  = e.clientY - dragOffsetY;
+    left = Math.max(margin, Math.min(left, window.innerWidth  - popupEl.offsetWidth  - margin));
+    top  = Math.max(margin, Math.min(top,  window.innerHeight - popupEl.offsetHeight - margin));
+    popupEl.style.left = left + "px";
+    popupEl.style.top  = top  + "px";
+  });
+
+  document.addEventListener("mouseup", () => { dragging = false; });
 
   // Hide when clicking outside
   document.addEventListener("mousedown", (e) => {
