@@ -162,6 +162,8 @@
 
   // ---------- speak ----------
 
+  const speakCache = new Map(); // key: `${lang}\x00${text}` → dataUrl
+
   function speakText(btn, lang, text) {
     if (!lang || lang === "auto") return;
 
@@ -170,6 +172,24 @@
       btn._audio = null;
       btn.classList.remove("qt-speaking");
       btn.innerHTML = btn._origHtml;
+      return;
+    }
+
+    const cacheKey = `${lang}\x00${text}`;
+    const cached = speakCache.get(cacheKey);
+
+    if (cached) {
+      const audio = new Audio(cached);
+      btn._audio = audio;
+      btn._origHtml = btn.innerHTML;
+      btn.innerHTML = svgStop;
+      audio.play();
+      btn.classList.add("qt-speaking");
+      audio.addEventListener("ended", () => {
+        btn.classList.remove("qt-speaking");
+        btn._audio = null;
+        btn.innerHTML = btn._origHtml;
+      });
       return;
     }
 
@@ -187,6 +207,8 @@
           setTimeout(() => btn.classList.remove("qt-speak-error"), 1500);
           return;
         }
+
+        speakCache.set(cacheKey, res.dataUrl);
 
         const audio = new Audio(res.dataUrl);
         btn._audio = audio;
